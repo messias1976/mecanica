@@ -15,5 +15,5 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npx --yes esbuild src/App.jsx --loader=jsx --outfile=/tmp/app.js
+      - run: npx --yes esbuild src/App.jsx --loader:.jsx=jsx --outfile=/tmp/app.js
       - run: npm run build
