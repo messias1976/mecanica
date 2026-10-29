@@ -1,18 +1,25 @@
 # AutoManager — Oficina Pro
 
-Aplicação React + Vite para gestão operacional de oficinas mecânicas.
+Aplicação React + Vite para gestão de uma oficina mecânica, com autenticação e persistência online via Supabase.
 
 ## Funcionalidades
-- Dashboard com faturamento de ordens concluídas/entregues, orçamentos pendentes, execução e alertas de estoque.
-- Ordens de serviço: cadastro e edição, cliente/veículo, checklist de entrada, peças, serviços, totais, status e detalhes.
-- Envio de orçamento pelo WhatsApp com mensagem pré-preenchida.
-- Clientes e veículos: cadastro, edição, múltiplos veículos e histórico de OS.
-- Estoque: cadastro/edição de peças, custo, preço de venda, margem e alerta de estoque mínimo.
-- Persistência local usando `localStorage`, para manter os dados no mesmo navegador após recarregar.
+- Dashboard de faturamento, orçamentos, serviços em execução e alertas de estoque.
+- Ordens de serviço com cliente/veículo, checklist, peças, serviços, totais, status e WhatsApp.
+- Clientes e veículos com múltiplos veículos e histórico de OS.
+- Estoque com custo, preço de venda, margem e estoque mínimo.
+- Login por e-mail e senha via Supabase Auth.
+- PostgreSQL com Row Level Security (RLS) por usuário autenticado.
 
 ## Requisitos
-- Node.js 20 ou superior
-- npm
+- Node.js 20 ou superior, npm e projeto Supabase.
+
+## Configuração do banco e autenticação
+1. Crie um projeto em https://supabase.com/.
+2. No Supabase, abra **SQL Editor** e execute `supabase/migrations/001_initial_schema.sql`.
+3. Em **Authentication → Users**, crie manualmente o usuário da oficina. O app não oferece cadastro público.
+4. Copie a Project URL e a chave pública/anon em Project Settings → API (ou Connect).
+5. Copie `.env.example` para `.env.local` e preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
+6. Nunca use a chave `service_role` no frontend nem a envie ao GitHub.
 
 ## Executar localmente
 ```bash
@@ -20,14 +27,19 @@ npm install
 npm run dev
 ```
 
-## Gerar build de produção
+## Build
 ```bash
 npm run build
 npm run preview
 ```
 
-## Observações importantes
-- Os dados são armazenados no navegador atual; não há backend, sincronização entre dispositivos, autenticação ou backup remoto nesta versão.
-- Os dados iniciais são exemplos demonstrativos. Remova-os ou altere-os para uso real.
-- O status de uma OS não debita automaticamente as peças do estoque. Registre movimentos de estoque manualmente até integrar esse fluxo.
-- O faturamento do painel considera somente ordens com status **Concluído** ou **Entregue**.
+## Publicar
+Importe o repositório no Vercel ou outro serviço de hospedagem estática com suporte a Vite. Configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` como variáveis de ambiente, use `npm run build` e pasta de saída `dist`, depois faça deploy novamente.
+
+## Segurança e limitações conhecidas
+- RLS limita os registros ao usuário autenticado que os criou/possui.
+- Crie apenas usuários autorizados no Supabase Auth; não habilite cadastro público.
+- Use somente a chave pública/anon no navegador. A chave service_role nunca deve ser exposta.
+- Os registros são armazenados em JSONB; validação de negócio ainda ocorre principalmente no frontend. Para operação crítica, recomenda-se validação adicional no banco/servidor e testes de segurança.
+- Esta versão não implementa backups próprios, trilha de auditoria, recuperação de desastre, controle automático de estoque por OS ou testes automatizados completos. Configure backups no plano escolhido e teste a restauração antes do uso comercial.
+- A base inicia vazia; os dados demonstrativos antigos não são importados.
