@@ -1,10 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Current Supabase projects use a publishable key (sb_publishable_...).
+// Keep the legacy anon variable as a backwards-compatible fallback.
+const publicKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabaseConfigured = Boolean(url && anonKey);
-export const supabase = supabaseConfigured ? createClient(url, anonKey, {
+export const supabaseConfigured = Boolean(url && publicKey);
+export const supabase = supabaseConfigured ? createClient(url, publicKey, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 }) : null;
 
